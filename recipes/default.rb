@@ -56,19 +56,19 @@ template "/etc/authconfig/arguments" do
   notifies :reload, "service[autofs]"  if node['authconfig']['autofs']['enable']
 end
 
-if node['authconfig']['ldap']['enable']
-  package 'pam_ldap' do
-    action :install
-  end
-end
-
-if node['authconfig']['kerberos']['enable']
-  package 'pam_krb5' do
-    action :install
-  end
-end
-
 if node[:platform_version].to_i == 6
+  if node['authconfig']['ldap']['enable']
+    package 'pam_ldap' do
+      action :install
+    end
+  end
+
+  if node['authconfig']['kerberos']['enable']
+    package 'pam_krb5' do
+      action :install
+    end
+  end
+
 	package "sssd" do
 		action :install
 	end
