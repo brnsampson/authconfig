@@ -56,7 +56,7 @@ reconnection_retries = 3
 
 <% 1.upto(numdomains) do |count| -%>
 [domain/domain<%= count %>]
-enumerate = false
+enumerate = <%= node[:authconfig][:sssd][:enumerate] %>
 ldap_uri = <%= node[:authconfig][:ldap][:server] %>
 <% if node[:authconfig][:ldap][:dnbase] != '' -%>
 ldap_search_base = <%= dnbasearr[count-1] %>
@@ -86,6 +86,9 @@ chpass_provider = ldap
 <% elsif node[:authconfig][:kerberos][:enable] -%>
 auth_provider = krb5
 chpass_provider = krb5
+<% if node[:authconfig][:kerberos][:cachecreds] -%>
+krb5_store_password_if_offline = True
+<% end -%>
 krb5_realm = <%= node[:authconfig][:kerberos][:realm] %>
 krb5_server = <%= node[:authconfig][:kerberos][:kdcserver] %>
 krb5_kpasswd = <%= node[:authconfig][:kerberos][:passwdserver] %>
@@ -119,16 +122,18 @@ ldap_default_authtok = <%= node[:authconfig][:ldap][:bindpw] %>
 <% end -%>
 
 <% if node[:authconfig][:ldap][:server_is_ad] -%>
-min_id = 700
+min_id = 10000
 ldap_user_principal = userPrincipalName
 ldap_user_fullname = displayName
 ldap_user_name = sAMAccountName
 ldap_user_object_class = user
 ldap_user_home_directory = unixHomeDirectory
 ldap_user_principal = userPrincipalName
+
 ldap_group_object_class = group
-ldap_force_upper_case_realm = True
 ldap_group_member = msSFU30PosixMember
+
+ldap_force_upper_case_realm = True
 
 <% else -%>
 ldap_group_member = uniqueMember

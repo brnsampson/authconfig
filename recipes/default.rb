@@ -57,9 +57,11 @@ template "/etc/authconfig/arguments" do
 end
 
 if node[:platform_version].to_i == 6
-  if node['authconfig']['ldap']['enable']
-    package 'pam_ldap' do
-      action :install
+  unless node['authconfig']['sssd']['enable']
+    if node['authconfig']['ldap']['enable']
+      package 'pam_ldap' do
+        action :install
+      end
     end
   end
 
@@ -69,7 +71,7 @@ if node[:platform_version].to_i == 6
     end
   end
 
-	package "sssd" do
+  package "sssd" do
 		action :install
 	end
 
